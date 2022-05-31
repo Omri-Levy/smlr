@@ -7,6 +7,17 @@ import { nanoid } from 'nanoid';
 describe(`Link`, () => {
 	let app: INestApplication;
 	let httpServer: any;
+	const badMethods = [`put`, `patch`, `delete`];
+	const longUrl = `https://www.google.com/`;
+	let slug: string;
+	const invalidSlugs = [
+		// Too short
+		nanoid(9),
+		// Too long
+		nanoid(12),
+		// Symbols
+		`!@#$%^&*()!@#`,
+	];
 
 	beforeAll(async () => {
 		const moduleRef = await Test.createTestingModule({
@@ -23,22 +34,34 @@ describe(`Link`, () => {
 		await request(httpServer).get(`/api/v1/test`).expect(404);
 	});
 
-	const badMethods = [`put`, `patch`, `delete`];
-
 	badMethods.forEach((method) => {
 		it(`Handles method not allowed ${method.toUpperCase()}`, async () => {
 			await request(httpServer)[method](`/api/v1/link`).expect(405);
 		});
 	});
 
-	const invalidSlugs = [
-		// Too short
-		nanoid(9),
-		// Too long
-		nanoid(12),
-		// Symbols
-		`!@#$%^&*()!@#`,
-	];
+	it(`Handles invalid longUrl`, async () => {
+		await request(httpServer)
+			.post(`/api/v1/link`)
+			.send({
+				longUrl: `google`,
+			})
+			.expect(400);
+	});
+
+	it(`Creates and returns a shortened url if longUrl is valid`, async () => {
+		const res = await request(httpServer)
+			.post(`/api/v1/link`)
+			.send({
+				longUrl,
+			})
+			.expect(201);
+		const { shortUrl } = res.body;
+		slug = shortUrl.slice(shortUrl.lastIndexOf(`/`) + 1);
+
+		expect(slug).toHaveLength(11);
+		expect(slug).toMatch(/([a-z]|_|-)/i);
+	});
 
 	invalidSlugs.forEach((slug) => {
 		it(`Handles invalid slug ${slug}`, async () => {
@@ -47,9 +70,11 @@ describe(`Link`, () => {
 	});
 
 	it(`Passes with valid slug`, async () => {
-		const slug = nanoid(11);
+		const res = await request(httpServer)
+			.post(`/api/v1/link/${slug}`)
+			.expect(302);
 
-		await request(httpServer).post(`/api/v1/link/${slug}`).expect(201);
+		expect(res.headers.location).toBe(longUrl);
 	});
 
 	afterAll(async () => {

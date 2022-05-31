@@ -7,7 +7,7 @@ export class AppController {
 
 	@Get()
 	@Render(`index`)
-	getHello(): { message: string } {
+	getHello() {
 		return this.appService.getHello();
 	}
 }
