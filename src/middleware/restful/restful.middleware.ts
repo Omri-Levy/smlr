@@ -32,7 +32,7 @@
 import { NextFunction, Request, Response } from 'express';
 import { MethodNotAllowedException } from '@nestjs/common';
 
-export const restful =
+export const restfulMiddleware =
 	(methods) => (req: Request, res: Response, next: NextFunction) => {
 		const { method } = req; // [2]
 
