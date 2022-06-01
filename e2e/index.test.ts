@@ -4,5 +4,5 @@ test(`It navigates to /`, async ({ page }) => {
 	await page.goto(`/`);
 
 	// The page title should render
-	// await expect(page.locator(`h1`)).toContainText(/link-shortner/i);
+	// await expect(page.locator(`h1`)).toContainText(/link-shortener/i);
 });

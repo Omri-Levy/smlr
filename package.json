@@ -1,5 +1,5 @@
 {
-	"name": "link-shortner",
+	"name": "link-shortener",
 	"version": "0.0.1",
 	"description": "",
 	"author": "",
@@ -24,6 +24,7 @@
 	},
 	"dependencies": {
 		"@nestjs/common": "^8.0.0",
+		"@nestjs/config": "^2.0.1",
 		"@nestjs/core": "^8.0.0",
 		"@nestjs/platform-express": "^8.0.0",
 		"@nestjs/typeorm": "^8.0.4",

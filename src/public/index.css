@@ -1,0 +1,53 @@
+*,
+*:before,
+*:after {
+	box-sizing: border-box;
+}
+
+
+body {
+	margin: 0;
+}
+
+main {
+	padding-top: 20rem;
+}
+
+section {
+	max-width: 960px;
+	width: 100%;
+	margin: 0 auto;
+	display: grid;
+	place-content: center;
+}
+
+button {
+	min-height: 2rem;
+	border: none;
+	background: #3b82f6;
+	padding-inline: 1rem;
+	padding-block: 0.5rem;
+	border-radius: 5px;
+	color: #fff;
+	font-weight: 900;
+	text-transform: uppercase;
+	cursor: pointer;
+}
+
+button:hover {
+	opacity: 90%;
+}
+
+input {
+	min-height: 2rem;
+	width: 30rem;
+}
+
+.short-url-container {
+	margin-left: auto;
+	margin-top: 1rem;
+}
+
+.short-url:hover {
+	color: #3b82f6;
+}

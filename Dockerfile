@@ -4,8 +4,8 @@ WORKDIR /usr/src/app
 
 RUN npm i -g pnpm
 
-COPY package.json ./
-COPY pnpm-lock.yaml ./
+COPY ./package.json ./
+COPY ./pnpm-lock.yaml ./
 
 ENV NODE_ENV=production
 
