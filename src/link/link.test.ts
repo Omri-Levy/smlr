@@ -4,9 +4,8 @@ import { INestApplication } from '@nestjs/common';
 import { nanoid } from 'nanoid';
 import { Link } from './link.entity';
 import { Repository } from 'typeorm';
-import { getRepositoryToken, TypeOrmModule } from '@nestjs/typeorm';
-import { ConfigModule } from '@nestjs/config';
-import { LinkModule } from './link.module';
+import { getRepositoryToken } from '@nestjs/typeorm';
+import { AppModule } from '../app/app.module';
 
 describe(`Link`, () => {
 	let slug: string;
@@ -28,17 +27,7 @@ describe(`Link`, () => {
 
 	beforeAll(async () => {
 		const moduleRef: TestingModule = await Test.createTestingModule({
-			imports: [
-				ConfigModule.forRoot(),
-				TypeOrmModule.forRoot({
-					type: `sqlite`,
-					database: `:memory:`,
-					entities: [__dirname + `/../**/*.entity.{js,ts}`],
-					synchronize: true,
-					dropSchema: true,
-				}),
-				LinkModule,
-			],
+			imports: [AppModule],
 		}).compile();
 
 		app = moduleRef.createNestApplication();
