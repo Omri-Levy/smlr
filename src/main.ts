@@ -5,6 +5,7 @@ import { resolve } from 'path';
 import { AppModule } from './app/app.module';
 import * as csurf from 'csurf';
 import * as cookieParser from 'cookie-parser';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 async function bootstrap() {
 	const app = await NestFactory.create<NestExpressApplication>(AppModule, {
@@ -20,7 +21,39 @@ async function bootstrap() {
 
 	app.use(helmet());
 	app.use(cookieParser());
-	app.use(csurf({ cookie: true }));
+	app.use(
+		csurf({
+			cookie: {
+				sameSite: `strict`,
+				secure: process.env.NODE_ENV === `production`,
+				httpOnly: true,
+				maxAge: 1000 * 60 * 60 * 9, // 9 hours
+			},
+		}),
+	);
+
+	const config = new DocumentBuilder()
+		.setTitle(`Link shortener`)
+		.setDescription(
+			`An API to make a simple idea as feature complete as I currently can.`,
+		)
+		.setVersion(`1.0`)
+		.addTag(`link shortener`)
+		.build();
+	const document = SwaggerModule.createDocument(app, config);
+	SwaggerModule.setup(`docs`, app, document, {
+		swaggerOptions: {
+			requestInterceptor: async (req) => {
+				const res = await fetch(`/api/v1/csrf`);
+				const { data } = await res.json();
+				const csrfToken = data?.csrfToken;
+
+				req.headers[`XSRF-TOKEN`] = csrfToken;
+
+				return req;
+			},
+		},
+	});
 
 	await app.listen(3000);
 }

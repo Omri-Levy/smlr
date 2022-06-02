@@ -9,13 +9,13 @@ formEl.addEventListener(`submit`, async function (e) {
 	const { 'long-url': longUrl, _csrf } = Object.fromEntries(
 		new FormData(form),
 	);
-	const res = await fetch(`/`, {
+	const res = await fetch(`/api/v1`, {
 		method: `POST`,
 		headers: {
 			'Content-Type': `application/json`,
 			'XSRF-Token': _csrf,
 		},
-		credentials: `include`,
+		credentials: `same-origin`,
 		body: JSON.stringify({ longUrl }),
 	});
 	const { data: { shortUrl } = {} } = await res.json();

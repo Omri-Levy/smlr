@@ -99,7 +99,6 @@ describe(`Link`, () => {
 		const {
 			headers: { location },
 		} = await request(httpServer).get(`/${slug}`).expect(302);
-
 		expect(location).toBe(longUrl);
 	});
 
