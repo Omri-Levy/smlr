@@ -13,7 +13,7 @@ describe(`Link`, () => {
 	let httpServer: any;
 	let linkRepository: Repository<Link>;
 	const badMethods = [`put`, `patch`, `delete`];
-	const longUrl = `https://www.google.com/`;
+	const longUrl = `https://omri-levy.dev/`;
 
 	const LINK_REPOSITORY_TOKEN = getRepositoryToken(Link);
 	const invalidSlugs = [
@@ -48,15 +48,17 @@ describe(`Link`, () => {
 	});
 
 	it(`Handles invalid longUrl`, async () => {
+		const longUrl = `localhost`;
+
 		await request(httpServer)
-			.post(`/`)
+			.post(`/api/v1`)
 			.send({
-				longUrl: `google`,
+				longUrl,
 			})
 			.expect(400);
 
 		const newLink = await linkRepository.findOne({
-			where: { longUrl: `google` },
+			where: { longUrl },
 		});
 
 		expect(newLink).toBeNull();
@@ -68,7 +70,7 @@ describe(`Link`, () => {
 				data: { shortUrl },
 			},
 		} = await request(httpServer)
-			.post(`/`)
+			.post(`/api/v1`)
 			.send({
 				longUrl,
 			})

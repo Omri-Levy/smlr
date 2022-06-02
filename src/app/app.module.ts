@@ -9,10 +9,14 @@ import { APP_GUARD } from '@nestjs/core';
 
 @Module({
 	imports: [
-		ThrottlerModule.forRoot({
-			ttl: 1,
-			limit: 3,
-		}),
+		ThrottlerModule.forRoot(
+			process.env.NODE_ENV === `test` || process.env.CI
+				? {}
+				: {
+						ttl: 1,
+						limit: 3,
+				  },
+		),
 		ConfigModule.forRoot(),
 		TypeOrmModule.forRoot({
 			type: process.env.CI ? `sqlite` : `mysql`,
