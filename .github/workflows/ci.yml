@@ -46,7 +46,7 @@ jobs:
       - name: Prettier
         run: pnpm format
       - name: Jest
-        run: docker-compose -f docker-compose.dev.yml up -d && pnpm test
+        run: pnpm test
       - name: Install Playwright
         run: npx playwright install --with-deps
       - name: Playwright
