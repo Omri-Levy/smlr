@@ -15,34 +15,40 @@
             <input type="text" name="long-url" />
             <button type="submit">SHORTEN</button>
         </form>
+        <div class="short-url-container"></div>
     </section>
 </main>
 <script>
-  const formEl = document.getElementById("shorten-link-form");
-  const sectionEl = document.querySelector("main section");
+  const formEl = document.getElementById(`shorten-link-form`);
+  const shortUrlContainerEl = document.querySelector(`.short-url-container`);
 
-  formEl.addEventListener("submit", async function(e) {
+  formEl.addEventListener(`submit`, async function(e) {
 	e.preventDefault();
 
 	const form = this;
-	const longUrl = form.querySelector("input[name=long-url]").value;
+	const { "long-url": longUrl, _csrf } = Object.fromEntries(
+	  new FormData(form)
+	);
 
-	const res = await fetch("/", {
-	  method: "POST",
-	  body: JSON.stringify({ longUrl }),
+	const res = await fetch(`/`, {
+	  method: `POST`,
 	  headers: {
-		"Content-Type": "application/json"
-	  }
+		"Content-Type": `application/json`
+	  },
+	  body: JSON.stringify({ longUrl, _csrf })
 	});
-	const { shortUrl } = await res.json();
-	const shortUrlEL = document.createElement("a");
+	const { data: { shortUrl } } = await res.json();
+	const shortUrlEL = document.createElement(`a`);
 
-	shortUrlEL.classList.add("short-url");
+	shortUrlEL.classList.add(`short-url`);
+	shortUrlEL.target = `_blank`;
 	shortUrlEL.href = shortUrl;
 	shortUrlEL.textContent = shortUrl;
 
-	sectionEl.appendChild(shortUrlEL);
+	shortUrlContainerEl.innerHTML = ``;
+	shortUrlContainerEl.appendChild(shortUrlEL);
   });
+
 </script>
 </body>
 </html>
