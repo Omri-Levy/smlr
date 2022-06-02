@@ -4,9 +4,15 @@ import { AppController } from './app.controller';
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { APP_GUARD } from '@nestjs/core';
 
 @Module({
 	imports: [
+		ThrottlerModule.forRoot({
+			ttl: 1,
+			limit: 3,
+		}),
 		ConfigModule.forRoot(),
 		TypeOrmModule.forRoot({
 			type: process.env.CI ? `sqlite` : `mysql`,
@@ -29,6 +35,12 @@ import { ConfigModule } from '@nestjs/config';
 		LinkModule,
 	],
 	controllers: [AppController],
-	providers: [AppService],
+	providers: [
+		AppService,
+		{
+			provide: APP_GUARD,
+			useClass: ThrottlerGuard,
+		},
+	],
 })
 export class AppModule {}
