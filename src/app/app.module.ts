@@ -11,7 +11,7 @@ import { ConfigModule } from '@nestjs/config';
 		TypeOrmModule.forRoot({
 			type: `mysql`,
 			host:
-				process.env.NODE_ENV === `test`
+				process.env.NODE_ENV === `test` || process.env.CI
 					? `localhost`
 					: process.env.MYSQL_HOST,
 			port: Number(process.env.MYSQL_PORT),
@@ -23,7 +23,7 @@ import { ConfigModule } from '@nestjs/config';
 					: process.env.MYSQL_DATABASE,
 			entities: [__dirname + `/../**/*.entity.{js,ts}`],
 			synchronize: process.env.NODE_ENV !== `production`,
-			dropSchema: process.env.NODE_ENV === `test`,
+			dropSchema: process.env.NODE_ENV === `test` || process.env.CI,
 		}),
 		LinkModule,
 	],
