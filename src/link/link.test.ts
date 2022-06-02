@@ -54,6 +54,12 @@ describe(`Link`, () => {
 				longUrl: `google`,
 			})
 			.expect(400);
+
+		const newLink = await linkRepository.findOne({
+			where: { longUrl: `google` },
+		});
+
+		expect(newLink).toBeNull();
 	});
 
 	it(`Creates and returns a shortened url if longUrl is valid`, async () => {
@@ -92,7 +98,6 @@ describe(`Link`, () => {
 	it(`Passes with valid slug`, async () => {
 		const {
 			headers: { location },
-			...res
 		} = await request(httpServer).get(`/${slug}`).expect(302);
 
 		expect(location).toBe(longUrl);
