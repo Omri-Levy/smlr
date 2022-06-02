@@ -45,6 +45,8 @@ jobs:
         run: pnpm lint
       - name: Prettier
         run: pnpm format
+      - name: Docker compose
+        run: docker-compose -f docker-compose.dev.yml up -d
       - name: Jest
         run: pnpm test
       - name: Install Playwright
