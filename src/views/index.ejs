@@ -7,48 +7,19 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Link Shortener</title>
     <link rel="stylesheet" href="index.css" />
+    <script defer src="shorten-url.js">
+    </script>
 </head>
 <body>
 <main>
     <section>
-        <form method="post" action="/" id="shorten-link-form">
+        <form method="post" action="/" id="shorten-url-form">
+            <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
             <input type="text" name="long-url" />
             <button type="submit">SHORTEN</button>
         </form>
         <div class="short-url-container"></div>
     </section>
 </main>
-<script>
-  const formEl = document.getElementById(`shorten-link-form`);
-  const shortUrlContainerEl = document.querySelector(`.short-url-container`);
-
-  formEl.addEventListener(`submit`, async function(e) {
-	e.preventDefault();
-
-	const form = this;
-	const { "long-url": longUrl, _csrf } = Object.fromEntries(
-	  new FormData(form)
-	);
-
-	const res = await fetch(`/`, {
-	  method: `POST`,
-	  headers: {
-		"Content-Type": `application/json`
-	  },
-	  body: JSON.stringify({ longUrl, _csrf })
-	});
-	const { data: { shortUrl } } = await res.json();
-	const shortUrlEL = document.createElement(`a`);
-
-	shortUrlEL.classList.add(`short-url`);
-	shortUrlEL.target = `_blank`;
-	shortUrlEL.href = shortUrl;
-	shortUrlEL.textContent = shortUrl;
-
-	shortUrlContainerEl.innerHTML = ``;
-	shortUrlContainerEl.appendChild(shortUrlEL);
-  });
-
-</script>
 </body>
 </html>

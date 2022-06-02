@@ -5,5 +5,8 @@
 	"e2e",
 	"dist",
 	"**/*test.ts"
+  ],
+  "include": [
+	"**/*.ts"
   ]
 }
