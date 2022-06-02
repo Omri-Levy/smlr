@@ -23,7 +23,7 @@ import { ConfigModule } from '@nestjs/config';
 					: process.env.MYSQL_DATABASE,
 			entities: [__dirname + `/../**/*.entity.{js,ts}`],
 			synchronize: process.env.NODE_ENV !== `production`,
-			dropSchema: process.env.NODE_ENV === `test` || process.env.CI,
+			dropSchema: process.env.NODE_ENV === `test` || !!process.env.CI,
 		}),
 		LinkModule,
 	],
