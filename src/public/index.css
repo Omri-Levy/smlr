@@ -10,7 +10,7 @@ body {
 }
 
 main {
-	padding-top: 20rem;
+	padding-top: 15rem;
 }
 
 section {
@@ -58,4 +58,9 @@ input {
 
 .short-url:hover {
 	color: #3b82f6;
+}
+
+.error {
+	color: #DC2626;
+	min-height: 2rem;
 }

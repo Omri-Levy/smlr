@@ -4,7 +4,7 @@ test(`app`, async ({ page }) => {
 	await page.goto(`/`);
 
 	const longUrl = `https://www.google.com`;
-	const shortUrl = `http://localhost:3000/`;
+	const shortUrl = page.url();
 	const input = await page.locator(`input[name="long-url"]`);
 
 	await input.click();

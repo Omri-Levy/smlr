@@ -59,13 +59,12 @@ export class LinkService {
 			select: [`slug`],
 		};
 		const cacheKey = JSON.stringify(query);
-		const BASE_URL = `http://localhost:3000`;
 		const cachedSlug: string | undefined = await this.cacheManager.get(
 			cacheKey,
 		);
 
 		if (cachedSlug) {
-			return `${BASE_URL}/${cachedSlug}`;
+			return `${process.env.CORS_ORIGIN}${cachedSlug}`;
 		}
 
 		/* The query changed, clean the cache. */
@@ -85,6 +84,6 @@ export class LinkService {
 
 		await this.cacheManager.set(cacheKey, link?.slug);
 
-		return `${BASE_URL}/${link?.slug}`;
+		return `${process.env.CORS_ORIGIN}${link?.slug}`;
 	}
 }

@@ -1,6 +1,7 @@
 import { Controller, Get, Render, Req } from '@nestjs/common';
 import { AppService } from './app.service';
 import { ApiOkResponse } from '@nestjs/swagger';
+import { SkipThrottle } from '@nestjs/throttler';
 
 @Controller()
 export class AppController {
@@ -29,11 +30,13 @@ export class AppController {
 		};
 	}
 
+	@SkipThrottle()
 	@Get()
 	@Render(`index`)
 	@ApiOkResponse({ description: `Serves the index view` })
 	renderIndex(@Req() req) {
 		return {
+			error: ``,
 			csrfToken: req.csrfToken(),
 			recaptchaSiteKey:
 				process.env.NODE_ENV === `test` || process.env.CI

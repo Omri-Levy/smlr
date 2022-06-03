@@ -1,13 +1,17 @@
 import {
+	ArgumentsHost,
 	BadRequestException,
 	Body,
+	Catch,
 	Controller,
+	ExceptionFilter,
 	Get,
 	HttpException,
 	NotFoundException,
 	Param,
 	Post,
 	Res,
+	UseFilters,
 	UsePipes,
 	ValidationPipe,
 } from '@nestjs/common';
@@ -27,6 +31,28 @@ import {
 import { nanoid } from 'nanoid';
 import { HttpService } from '@nestjs/axios';
 import { catchError, map } from 'rxjs';
+import { Request, Response } from 'express';
+
+@Catch(HttpException)
+export class HttpExceptionFilter implements ExceptionFilter {
+	catch(exception: HttpException, host: ArgumentsHost) {
+		const ctx = host.switchToHttp();
+		const res = ctx.getResponse<Response>();
+		const req = ctx.getRequest<Request>();
+		const status = exception.getStatus();
+
+		res.render(`index`, {
+			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+			// @ts-ignore
+			error: `${exception?.response?.message} (${status})`,
+			csrfToken: req.csrfToken(),
+			recaptchaSiteKey:
+				process.env.NODE_ENV === `test` || process.env.CI
+					? process.env.RECAPTCHA_TEST_SITE_KEY
+					: process.env.RECAPTCHA_SITE_KEY,
+		});
+	}
+}
 
 @Controller()
 @UsePipes(
@@ -87,7 +113,7 @@ export class LinkController {
 		schema: {
 			example: {
 				statusCode: 404,
-				message: `Short url was not found`,
+				message: `Shortened url was not found`,
 			},
 		},
 	})
@@ -133,7 +159,7 @@ export class LinkController {
 		const shortUrl = await this.linkService.createLink(createLinkDto);
 
 		if (!shortUrl) {
-			throw new NotFoundException(`Short url was not found`);
+			throw new NotFoundException(`Shortened url was not found`);
 		}
 
 		return {
@@ -174,6 +200,7 @@ export class LinkController {
 		format: `slug`,
 		type: String,
 	})
+	@UseFilters(HttpExceptionFilter)
 	async redirect(@Param() params: GetLinkDto, @Res() res) {
 		const longUrl = await this.linkService.getLink(params);
 
