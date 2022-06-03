@@ -42,11 +42,18 @@ input {
 	min-height: 2rem;
 	width: 30rem;
 	border-radius: 5px;
+	margin-bottom: 1rem;
 }
 
 .short-url-container {
 	margin-right: auto;
 	margin-top: 1rem;
+	display: flex;
+	align-items: center;
+}
+
+.short-url-heading {
+	margin-right: 1rem;
 }
 
 .short-url:hover {

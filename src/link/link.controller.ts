@@ -1,7 +1,10 @@
 import {
+	BadRequestException,
 	Body,
 	Controller,
 	Get,
+	HttpException,
+	Logger,
 	NotFoundException,
 	Param,
 	Post,
@@ -23,6 +26,8 @@ import {
 	ApiParam,
 } from '@nestjs/swagger';
 import { nanoid } from 'nanoid';
+import { HttpService } from '@nestjs/axios';
+import { catchError, map } from 'rxjs';
 
 @Controller()
 @UsePipes(
@@ -31,7 +36,10 @@ import { nanoid } from 'nanoid';
 	}),
 )
 export class LinkController {
-	constructor(private readonly linkService: LinkService) {}
+	constructor(
+		private readonly linkService: LinkService,
+		private httpService: HttpService,
+	) {}
 
 	@Post(`/api/v1`)
 	@ApiCreatedResponse({
@@ -86,6 +94,44 @@ export class LinkController {
 	})
 	@ApiBody({ type: CreateLinkDto })
 	async createLink(@Body() createLinkDto: CreateLinkDto) {
+		const gRecaptchaResponse =
+			createLinkDto[`g-recaptcha-response`] ?? `pass`;
+
+		if (
+			!createLinkDto[`g-recaptcha-response`] &&
+			(process.env.NODE_ENV !== `test` || process.env.CI)
+		) {
+			Logger.debug(process.env.NODE_ENV);
+			throw new BadRequestException(
+				`Please verify that you are not a robot`,
+			);
+		}
+
+		const recaptchaKey =
+			process.env.NODE_ENV === `test` || process.env.CI
+				? process.env.RECAPTCHA_TEST_SECRET_KEY
+				: process.env.RECAPTCHA_SECRET_KEY;
+
+		const success = this.httpService
+			.post<{ success: boolean }>(
+				`https://www.google.com/recaptcha/api/siteverify?secret=${recaptchaKey}&response=${gRecaptchaResponse}`,
+			)
+			.pipe(
+				map((res) => res.data.success),
+				catchError((err) => {
+					throw new HttpException(
+						err.response.data,
+						err.response.status,
+					);
+				}),
+			);
+
+		if (!success) {
+			throw new BadRequestException(
+				`Please verify that you are not a robot`,
+			);
+		}
+
 		const shortUrl = await this.linkService.createLink(createLinkDto);
 
 		if (!shortUrl) {

@@ -38,7 +38,7 @@ import { APP_GUARD } from '@nestjs/core';
 			username: process.env.MYSQL_USER,
 			password: process.env.MYSQL_PASSWORD,
 			database: process.env.CI
-				? `:memory`
+				? `:memory:`
 				: process.env.NODE_ENV === `test`
 				? `link-shortener-test`
 				: process.env.MYSQL_DATABASE,

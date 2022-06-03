@@ -19,7 +19,23 @@ async function bootstrap() {
 	app.setBaseViewsDir(resolve(`./src/views`));
 	app.setViewEngine(`ejs`);
 
-	app.use(helmet());
+	app.use(
+		helmet({
+			contentSecurityPolicy: {
+				directives: {
+					'script-src': [
+						`'self'`,
+						`https://www.google.com/recaptcha/`,
+						`https://www.gstatic.com/recaptcha/`,
+					],
+					'frame-src': [
+						`https://www.google.com/recaptcha/`,
+						`https://recaptcha.google.com/recaptcha/`,
+					],
+				},
+			},
+		}),
+	);
 	app.use(cookieParser());
 	app.use(
 		csurf({
@@ -44,7 +60,7 @@ async function bootstrap() {
 	SwaggerModule.setup(`docs`, app, document, {
 		swaggerOptions: {
 			requestInterceptor: async (req) => {
-				const res = await fetch(`/api/v1/csrf`);
+				const res = await fetch(`${process.env.API_URL}/csrf`);
 				const { data } = await res.json();
 				const csrfToken = data?.csrfToken;
 

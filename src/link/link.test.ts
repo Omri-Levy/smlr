@@ -51,7 +51,7 @@ describe(`Link`, () => {
 		const longUrl = `localhost`;
 
 		await request(httpServer)
-			.post(`/api/v1`)
+			.post(process.env.API_URL)
 			.send({
 				longUrl,
 			})
@@ -70,7 +70,7 @@ describe(`Link`, () => {
 				data: { shortUrl },
 			},
 		} = await request(httpServer)
-			.post(`/api/v1`)
+			.post(process.env.API_URL)
 			.send({
 				longUrl,
 			})

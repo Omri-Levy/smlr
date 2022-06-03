@@ -10,7 +10,7 @@ export class AppController {
 	 * Temporary workaround for Postman and Swagger UI. Will do something more secure later.
 	 * @param req
 	 */
-	@Get(`/api/v1/csrf`)
+	@Get(`${process.env.API_URL}/csrf`)
 	@ApiOkResponse({
 		description: `Sends a CSRF token to be consumed by Postman and Swagger UI`,
 		schema: {
@@ -35,6 +35,10 @@ export class AppController {
 	renderIndex(@Req() req) {
 		return {
 			csrfToken: req.csrfToken(),
+			recaptchaSiteKey:
+				process.env.NODE_ENV === `test` || process.env.CI
+					? process.env.RECAPTCHA_TEST_SITE_KEY
+					: process.env.RECAPTCHA_SITE_KEY,
 		};
 	}
 }

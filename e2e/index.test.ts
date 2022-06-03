@@ -5,22 +5,25 @@ test(`app`, async ({ page }) => {
 
 	const longUrl = `https://www.google.com`;
 	const shortUrl = `http://localhost:3000/`;
-	const input = await page.locator(
-		`#shorten-url-form input[name="long-url"]`,
-	);
+	const input = await page.locator(`input[name="long-url"]`);
 
-	await input.type(longUrl);
+	await input.click();
+	await input.fill(longUrl);
 
 	expect(await input.inputValue()).toContain(longUrl);
 
-	const button = await page.locator(
-		`#shorten-url-form button[type="submit"]`,
-	);
+	/* Do the recaptcha */
+	await page
+		.frameLocator(`iframe[role="presentation"]`)
+		.locator(`span[role="checkbox"]`)
+		.click();
 
-	expect(await button.innerText()).toMatch(/shorten/i);
+	await page.waitForTimeout(1000);
 
-	await button.click();
+	/* The submit button should render with the expected text */
+	await page.locator(`text=SHORTEN`).click();
 
+	/* Test that the shortened link is present and that it has the expected values. */
 	const shortUrlAnchor = await page.locator(
 		`.short-url-container a.short-url`,
 	);
@@ -28,7 +31,10 @@ test(`app`, async ({ page }) => {
 	expect(await shortUrlAnchor.innerText()).toContain(shortUrl);
 	expect(await shortUrlAnchor.getAttribute(`href`)).toContain(shortUrl);
 
-	await page.$eval(`a.short-url`, (el) => el.removeAttribute(`target`));
+	/* Clicking the link should navigate to the expected url */
+	await page.$eval(`.short-url-container a.short-url`, (el) =>
+		el.removeAttribute(`target`),
+	);
 
 	await shortUrlAnchor.click();
 

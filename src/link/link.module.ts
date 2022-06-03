@@ -4,9 +4,16 @@ import { LinkService } from './link.service';
 import { restfulMiddleware } from '../middleware/restful/restful.middleware';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Link } from './link.entity';
+import { HttpModule } from '@nestjs/axios';
+import { TIMEOUT_IN_MS } from '../config';
 
 @Module({
-	imports: [TypeOrmModule.forFeature([Link])],
+	imports: [
+		HttpModule.register({
+			timeout: TIMEOUT_IN_MS,
+		}),
+		TypeOrmModule.forFeature([Link]),
+	],
 	controllers: [LinkController],
 	providers: [LinkService],
 })
