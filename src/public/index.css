@@ -41,6 +41,7 @@ button:hover {
 input {
 	min-height: 2rem;
 	width: 30rem;
+	border-radius: 5px;
 }
 
 .short-url-container {

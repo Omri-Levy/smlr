@@ -17,11 +17,11 @@ describe(`Link`, () => {
 
 	const LINK_REPOSITORY_TOKEN = getRepositoryToken(Link);
 	const invalidSlugs = [
-		// Too short
+		/* Too short */
 		nanoid(6),
-		// Too long
+		/* Too long */
 		nanoid(8),
-		// Symbols
+		/* Symbols */
 		`!@#$%^&*()!@#`,
 	];
 

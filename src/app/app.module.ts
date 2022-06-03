@@ -1,7 +1,9 @@
+import type { ClientOpts } from 'redis';
+import * as redisStore from 'cache-manager-redis-store';
 import { LinkModule } from '../link/link.module';
 import { AppService } from './app.service';
 import { AppController } from './app.controller';
-import { Module } from '@nestjs/common';
+import { CacheModule, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
@@ -9,6 +11,14 @@ import { APP_GUARD } from '@nestjs/core';
 
 @Module({
 	imports: [
+		CacheModule.register<ClientOpts>({
+			/* As long as the query is the same */
+			ttl: 0,
+			store: redisStore,
+			host: process.env.REDIS_HOST,
+			port: Number(process.env.REDIS_PORT),
+			isGlobal: true,
+		}),
 		ThrottlerModule.forRoot(
 			process.env.NODE_ENV === `test` || process.env.CI
 				? {}
