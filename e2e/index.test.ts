@@ -23,7 +23,7 @@ test(`app`, async ({ page }) => {
 	/* The submit button should render with the expected text */
 	const button = await page.locator(`button[type="submit"]`);
 
-	expect(await button.textContent()).toContain(/shorten/i);
+	expect(await button.textContent()).toMatch(/shorten/i);
 
 	await button.click();
 
