@@ -4,7 +4,6 @@ import {
 	Controller,
 	Get,
 	HttpException,
-	Logger,
 	NotFoundException,
 	Param,
 	Post,
@@ -94,14 +93,11 @@ export class LinkController {
 	})
 	@ApiBody({ type: CreateLinkDto })
 	async createLink(@Body() createLinkDto: CreateLinkDto) {
-		const gRecaptchaResponse =
-			createLinkDto[`g-recaptcha-response`] ?? `pass`;
-
 		if (
 			!createLinkDto[`g-recaptcha-response`] &&
-			(process.env.NODE_ENV !== `test` || process.env.CI)
+			process.env.NODE_ENV !== `test` &&
+			!process.env.CI
 		) {
-			Logger.debug(process.env.NODE_ENV);
 			throw new BadRequestException(
 				`Please verify that you are not a robot`,
 			);
@@ -114,7 +110,9 @@ export class LinkController {
 
 		const success = this.httpService
 			.post<{ success: boolean }>(
-				`https://www.google.com/recaptcha/api/siteverify?secret=${recaptchaKey}&response=${gRecaptchaResponse}`,
+				`https://www.google.com/recaptcha/api/siteverify?secret=${recaptchaKey}&response=${
+					createLinkDto[`g-recaptcha-response`] ?? `pass`
+				}`,
 			)
 			.pipe(
 				map((res) => res.data.success),

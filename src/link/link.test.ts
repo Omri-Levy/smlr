@@ -54,6 +54,7 @@ describe(`Link`, () => {
 			.post(process.env.API_URL)
 			.send({
 				longUrl,
+				'g-recaptcha-response': `pass`,
 			})
 			.expect(400);
 
@@ -73,6 +74,7 @@ describe(`Link`, () => {
 			.post(process.env.API_URL)
 			.send({
 				longUrl,
+				'g-recaptcha-response': `pass`,
 			})
 			.expect(201);
 		slug = shortUrl.slice(shortUrl.lastIndexOf(`/`) + 1);
