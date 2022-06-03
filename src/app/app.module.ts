@@ -14,7 +14,7 @@ import { APP_GUARD } from '@nestjs/core';
 		CacheModule.register<ClientOpts>({
 			/* As long as the query is the same */
 			ttl: 0,
-			store: redisStore,
+			store: process.env.CI ? undefined : redisStore,
 			host: process.env.REDIS_HOST,
 			port: Number(process.env.REDIS_PORT),
 			isGlobal: true,
