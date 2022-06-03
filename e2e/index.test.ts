@@ -21,7 +21,11 @@ test(`app`, async ({ page }) => {
 	await page.waitForTimeout(1000);
 
 	/* The submit button should render with the expected text */
-	await page.locator(`text=SHORTEN`).click();
+	const button = await page.locator(`button[type="submit"]`);
+
+	expect(await button.textContent()).toContain(/shorten/i);
+
+	await button.click();
 
 	/* Test that the shortened link is present and that it has the expected values. */
 	const shortUrlAnchor = await page.locator(
