@@ -4,6 +4,7 @@ WORKDIR /usr/src/app
 
 RUN npm i -g pnpm
 
+COPY .npmrc ./
 COPY ./package.json ./
 COPY ./pnpm-lock.yaml ./
 
