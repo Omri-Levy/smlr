@@ -1,11 +1,11 @@
 import * as request from 'supertest';
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
-import { nanoid } from 'nanoid';
 import { Link } from './link.entity';
 import { Repository } from 'typeorm';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { AppModule } from '../app/app.module';
+import { nanoid } from 'nanoid';
 
 describe(`Link`, () => {
 	let slug: string;
@@ -22,7 +22,7 @@ describe(`Link`, () => {
 		/* Too long */
 		nanoid(8),
 		/* Symbols */
-		`!@#$%^&*()!@#`,
+		`!@#$%^&`,
 	];
 
 	beforeAll(async () => {
@@ -47,11 +47,22 @@ describe(`Link`, () => {
 		});
 	});
 
+	/* handles you are not a robot */
+	it(`Handles you are not a robot`, async () => {
+		await request(httpServer)
+			.post(`/api/v1`)
+			.send({
+				longUrl,
+				/* Omitted g-recaptcha-response */
+			})
+			.expect(400);
+	});
+
 	it(`Handles invalid longUrl`, async () => {
 		const longUrl = `localhost`;
 
 		await request(httpServer)
-			.post(process.env.API_URL)
+			.post(`/api/v1`)
 			.send({
 				longUrl,
 				'g-recaptcha-response': `pass`,
@@ -71,12 +82,13 @@ describe(`Link`, () => {
 				data: { shortUrl },
 			},
 		} = await request(httpServer)
-			.post(process.env.API_URL)
+			.post(`/api/v1`)
 			.send({
 				longUrl,
 				'g-recaptcha-response': `pass`,
 			})
 			.expect(201);
+
 		slug = shortUrl.slice(shortUrl.lastIndexOf(`/`) + 1);
 
 		expect(slug).toHaveLength(7);
@@ -97,6 +109,10 @@ describe(`Link`, () => {
 		it(`Handles invalid slug ${slug}`, async () => {
 			await request(httpServer).get(`/${slug}`).expect(400);
 		});
+	});
+
+	it(`Handles valid slug`, async () => {
+		await request(httpServer).get(`/!@#$%^&`).expect(400);
 	});
 
 	it(`Passes with valid slug`, async () => {

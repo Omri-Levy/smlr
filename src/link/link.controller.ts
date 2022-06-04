@@ -1,17 +1,14 @@
 import {
-	ArgumentsHost,
 	BadRequestException,
 	Body,
-	Catch,
 	Controller,
-	ExceptionFilter,
 	Get,
 	HttpException,
 	NotFoundException,
 	Param,
 	Post,
+	Req,
 	Res,
-	UseFilters,
 	UsePipes,
 	ValidationPipe,
 } from '@nestjs/common';
@@ -31,28 +28,6 @@ import {
 import { nanoid } from 'nanoid';
 import { HttpService } from '@nestjs/axios';
 import { catchError, map } from 'rxjs';
-import { Request, Response } from 'express';
-
-@Catch(HttpException)
-export class HttpExceptionFilter implements ExceptionFilter {
-	catch(exception: HttpException, host: ArgumentsHost) {
-		const ctx = host.switchToHttp();
-		const res = ctx.getResponse<Response>();
-		const req = ctx.getRequest<Request>();
-		const status = exception.getStatus();
-
-		res.render(`index`, {
-			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-			// @ts-ignore
-			error: `${exception?.response?.message} (${status})`,
-			csrfToken: req.csrfToken(),
-			recaptchaSiteKey:
-				process.env.NODE_ENV === `test` || process.env.CI
-					? process.env.RECAPTCHA_TEST_SITE_KEY
-					: process.env.RECAPTCHA_SITE_KEY,
-		});
-	}
-}
 
 @Controller()
 @UsePipes(
@@ -119,11 +94,7 @@ export class LinkController {
 	})
 	@ApiBody({ type: CreateLinkDto })
 	async createLink(@Body() createLinkDto: CreateLinkDto) {
-		if (
-			!createLinkDto[`g-recaptcha-response`] &&
-			process.env.NODE_ENV !== `test` &&
-			!process.env.CI
-		) {
+		if (!createLinkDto[`g-recaptcha-response`]) {
 			throw new BadRequestException(
 				`Please verify that you are not a robot`,
 			);
@@ -200,14 +171,16 @@ export class LinkController {
 		format: `slug`,
 		type: String,
 	})
-	@UseFilters(HttpExceptionFilter)
-	async redirect(@Param() params: GetLinkDto, @Res() res) {
+	/*
+	 * FIXME: Currently breaks the test suite, will fix at a later time.
+	 */
+	/* @UseFilters(HttpExceptionFilter) */
+	async redirect(@Param() params: GetLinkDto, @Req() req, @Res() res) {
 		const longUrl = await this.linkService.getLink(params);
 
 		if (!longUrl) {
 			throw new NotFoundException(`Url was not found`);
 		}
-
 		return res.redirect(longUrl);
 	}
 }

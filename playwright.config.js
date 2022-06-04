@@ -9,7 +9,7 @@ const config = {
 		reuseExistingServer: !process.env.CI,
 	},
 	use: {
-		headless: process.env.CI,
+		headless: !!process.env.CI,
 		viewport: { width: 600, height: 900 },
 		ignoreHTTPSErrors: true,
 		video: `on-first-retry`,
