@@ -7,8 +7,7 @@ app.
 
 #### Highlights
 
-* Rate limiting
-* Recaptcha
+* Rate limiting, Recaptcha, and CSRF mitigation
 * A cache layer using Redis
 * E2E and Integration tests
 * MVC architecture, using the repository pattern for accessing the data layer,
