@@ -4,8 +4,8 @@ import { CreateLinkDto } from './dtos/create-link.dto';
 import { nanoid } from 'nanoid';
 import { FindOneOptions, Repository } from 'typeorm';
 import { Link } from './link.entity';
-import { InjectRepository } from '@nestjs/typeorm';
 import { Cache } from 'cache-manager';
+import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
 export class LinkService {
@@ -64,7 +64,7 @@ export class LinkService {
 		);
 
 		if (cachedSlug) {
-			return `${process.env.CORS_ORIGIN}${cachedSlug}`;
+			return `${process.env.BASE_URL}${cachedSlug}`;
 		}
 
 		/* The query changed, clean the cache. */
@@ -84,6 +84,6 @@ export class LinkService {
 
 		await this.cacheManager.set(cacheKey, link?.slug);
 
-		return `${process.env.CORS_ORIGIN}${link?.slug}`;
+		return `${process.env.BASE_URL}${link?.slug}`;
 	}
 }

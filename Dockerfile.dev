@@ -1,18 +1,16 @@
 FROM node:14-alpine
+ENV NODE_ENV=development
 
 WORKDIR /usr/src/app
 
 RUN npm i -g pnpm
 
-COPY ./.npmrc ./
-COPY ./package.json ./
-COPY ./pnpm-lock.yaml ./
+COPY pnpm-lock.yaml ./
+COPY package.json ./
 
-ENV NODE_ENV=development
+RUN pnpm i
 
-RUN pnpm install
-
-COPY ./ ./
+COPY . .
 
 EXPOSE 3000
 

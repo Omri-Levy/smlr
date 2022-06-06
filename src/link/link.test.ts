@@ -3,7 +3,6 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import { Link } from './link.entity';
 import { Repository } from 'typeorm';
-import { getRepositoryToken } from '@nestjs/typeorm';
 import { AppModule } from '../app/app.module';
 import { nanoid } from 'nanoid';
 
@@ -14,8 +13,6 @@ describe(`Link`, () => {
 	let linkRepository: Repository<Link>;
 	const badMethods = [`put`, `patch`, `delete`];
 	const longUrl = `https://omri-levy.dev/`;
-
-	const LINK_REPOSITORY_TOKEN = getRepositoryToken(Link);
 	const invalidSlugs = [
 		/* Too short */
 		nanoid(6),
@@ -34,7 +31,7 @@ describe(`Link`, () => {
 		await app.init();
 
 		httpServer = app.getHttpServer();
-		linkRepository = moduleRef.get(LINK_REPOSITORY_TOKEN);
+		linkRepository = moduleRef.get(`LINK_REPOSITORY`);
 	});
 
 	it(`Handles 404`, async () => {

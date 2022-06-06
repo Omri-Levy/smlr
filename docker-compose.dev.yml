@@ -15,9 +15,9 @@ services:
       - NODE_ENV=development
       - MYSQL_HOST=db
       - REDIS_HOST=redis
+      - BASE_URL=http://localhost:3000/
     env_file:
       - .env
-    command: "pnpm start:dev"
     restart: always
   db:
     container_name: db
@@ -29,7 +29,7 @@ services:
     env_file:
       - .env
     volumes:
-      - ./data:/var/lib/mysql
+      - ./data/db:/var/lib/mysql
   redis:
     container_name: redis
     image: redis:7-alpine
