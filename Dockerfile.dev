@@ -1,5 +1,4 @@
 FROM node:14-alpine
-ENV NODE_ENV=development
 
 WORKDIR /usr/src/app
 
@@ -7,6 +6,8 @@ RUN npm i -g pnpm
 
 COPY pnpm-lock.yaml ./
 COPY package.json ./
+
+ENV NODE_ENV=development
 
 RUN pnpm i
 

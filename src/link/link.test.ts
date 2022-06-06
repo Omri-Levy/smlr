@@ -72,7 +72,7 @@ describe(`Link`, () => {
 			where: { longUrl },
 		});
 
-		expect(newLink).toBeNull();
+		expect(newLink).toBeUndefined();
 	});
 
 	it(`Creates and returns a shortened url if longUrl is valid`, async () => {
@@ -108,10 +108,6 @@ describe(`Link`, () => {
 		it(`Handles invalid slug ${slug}`, async () => {
 			await request(httpServer).get(`/${slug}`).expect(400);
 		});
-	});
-
-	it(`Handles valid slug`, async () => {
-		await request(httpServer).get(`/!@#$%^&`).expect(400);
 	});
 
 	it(`Passes with valid slug`, async () => {
