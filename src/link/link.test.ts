@@ -3,19 +3,18 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import { Link } from './link.entity';
 import { Repository } from 'typeorm';
-import { getRepositoryToken } from '@nestjs/typeorm';
 import { AppModule } from '../app/app.module';
 import { nanoid } from 'nanoid';
+import { getRepositoryToken } from '@nestjs/typeorm';
 
 describe(`Link`, () => {
 	let slug: string;
 	let app: INestApplication;
 	let httpServer: any;
 	let linkRepository: Repository<Link>;
+	const LINK_REPOSITORY_TOKEN = getRepositoryToken(Link);
 	const badMethods = [`put`, `patch`, `delete`];
 	const longUrl = `https://omri-levy.dev/`;
-
-	const LINK_REPOSITORY_TOKEN = getRepositoryToken(Link);
 	const invalidSlugs = [
 		/* Too short */
 		nanoid(6),
@@ -73,7 +72,7 @@ describe(`Link`, () => {
 			where: { longUrl },
 		});
 
-		expect(newLink).toBeNull();
+		expect(newLink).toBeUndefined();
 	});
 
 	it(`Creates and returns a shortened url if longUrl is valid`, async () => {
@@ -109,10 +108,6 @@ describe(`Link`, () => {
 		it(`Handles invalid slug ${slug}`, async () => {
 			await request(httpServer).get(`/${slug}`).expect(400);
 		});
-	});
-
-	it(`Handles valid slug`, async () => {
-		await request(httpServer).get(`/!@#$%^&`).expect(400);
 	});
 
 	it(`Passes with valid slug`, async () => {

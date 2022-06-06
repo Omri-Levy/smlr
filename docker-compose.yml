@@ -1,5 +1,23 @@
 version: '3.9'
 services:
+  nginx:
+    container_name: nginx
+    restart: always
+    image: nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    command: "/bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'"
+    volumes:
+      - ./data/nginx:/etc/nginx/conf.d
+      - ./data/certbot/conf:/etc/letsencrypt
+      - ./data/certbot/www:/var/www/certbot
+  certbot:
+    image: certbot/certbot
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
+    volumes:
+      - ./data/certbot/conf:/etc/letsencrypt
+      - ./data/certbot/www:/var/www/certbot
   server:
     container_name: server
     depends_on:
@@ -15,9 +33,9 @@ services:
       - NODE_ENV=production
       - MYSQL_HOST=db
       - REDIS_HOST=redis
+      - BASE_URL=https://smlr.cc/
     env_file:
       - .env
-    command: "pnpm start"
     restart: always
   db:
     container_name: db
@@ -29,7 +47,7 @@ services:
     env_file:
       - .env
     volumes:
-      - ./data:/var/lib/mysql
+      - ./data/db:/var/lib/mysql
   redis:
     container_name: redis
     image: redis:7-alpine

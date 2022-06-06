@@ -1,20 +1,37 @@
-FROM node:14-alpine
+FROM node:14-alpine AS development
 
 WORKDIR /usr/src/app
 
 RUN npm i -g pnpm
 
-COPY ./package.json ./
-COPY ./pnpm-lock.yaml ./
+COPY pnpm-lock.yaml ./
+COPY package.json ./
+COPY tsconfig.json ./
 
-ENV NODE_ENV=production
+RUN pnpm i 
 
-RUN pnpm install
-
-COPY ./ ./
+COPY . .
 
 RUN pnpm build
 
+FROM node:14-alpine AS production
+
+ARG NODE_ENV=production
+ENV NODE_ENV=${NODE_ENV}
+
+WORKDIR /usr/src/app
+
+RUN npm i -g pnpm
+
+COPY pnpm-lock.yaml ./
+COPY package.json ./
+
+RUN pnpm i --prod
+
+COPY . .
+
+COPY --from=development /usr/src/app/dist ./dist
+
 EXPOSE 3000
 
-CMD ["pnpm", "start"]
+CMD ["node", "dist/main"]
