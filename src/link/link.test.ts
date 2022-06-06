@@ -5,12 +5,14 @@ import { Link } from './link.entity';
 import { Repository } from 'typeorm';
 import { AppModule } from '../app/app.module';
 import { nanoid } from 'nanoid';
+import { getRepositoryToken } from '@nestjs/typeorm';
 
 describe(`Link`, () => {
 	let slug: string;
 	let app: INestApplication;
 	let httpServer: any;
 	let linkRepository: Repository<Link>;
+	const LINK_REPOSITORY_TOKEN = getRepositoryToken(Link);
 	const badMethods = [`put`, `patch`, `delete`];
 	const longUrl = `https://omri-levy.dev/`;
 	const invalidSlugs = [
@@ -31,7 +33,7 @@ describe(`Link`, () => {
 		await app.init();
 
 		httpServer = app.getHttpServer();
-		linkRepository = moduleRef.get(`LINK_REPOSITORY`);
+		linkRepository = moduleRef.get(LINK_REPOSITORY_TOKEN);
 	});
 
 	it(`Handles 404`, async () => {
